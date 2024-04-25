@@ -1,26 +1,33 @@
-# HOW TO SETUP
+# JeanDuJardin
 
---------------------------------------------------
-# STEP 1 
+<!-- Add Description -->
 
-# METHOD 1
-- Execute cmaker.py
+## Prerequisites
 
-# METHOD 2
-- Create folder build at projet root
-- cd build
-- cmake ..
+- CMake (minimum version 3.11.0) 
+- MSVC 2019 x64 compiler CPP
+- Visual Studio or Rider IDE
 
-# END STEP 1
---------------------------------------------------
+## How to initialize build system ?
 
---------------------------------------------------
-# STEP 2
+#### Method 1
+- Execute setup.bat
 
+#### Method 2
+- Create folder build at projet root and execute cmake
+```
+mkdir build & cd build & cmake ..
+```
+
+## How to build ? 
+
+#### Method 1
+- Execute build_release.bat
+
+#### Method 2
 - Go in build
 - Open JeanDujardin.sln
 - Compile (debug or release)
 - Play, or not
 
-#  END STEP 2
 --------------------------------------------------
