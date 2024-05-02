@@ -5,6 +5,17 @@
 
 #include "pch.h"
 
+#include "lib/Math/MathMatrix.h"
+#include "lib/Math/Vertex.h"
+#include "lib/Clock/lsgClock.h"
+#include "Geometries/Triangle.h"
+
+#include <cmath>
+#include <array>
+
+const unsigned DEFAULT_WINDOW_WIDTH = 800;
+const unsigned DEFAULT_WINDOW_HEIGHT = 600;
+
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -12,7 +23,7 @@ static void glfw_error_callback(int error, const char* description)
 
 /// \fn int main(int argc, char** argv)
 ///
-int main(int argc, int **argv)
+int main(int argc, char** argv)
 {
     // Setup OPTICK 
     // OPTICK_FRAME("MainThread");
@@ -36,6 +47,42 @@ int main(int argc, int **argv)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
+    //Setup GLEW
+    glewExperimental = GL_TRUE;
+    if (glewInit())
+    {
+        throw std::runtime_error("Glew init error");
+    }
+
+    // Setup scene
+
+    VertexF p0{ {  -0.8f, -0.9f, 0.f }, { 1.f, 0.f, 0.f, 1.f } };
+    VertexF p1{ {   0.9f, -0.9f, 0.f }, { 0.f, 1.f, 0.f, 1.f } };
+    VertexF p2{ {   0.9f,  0.8f, 0.f }, { 0.f, 0.f, 1.f, 1.f } };
+
+    TriangleF t0{ p0, p1, p2 };
+
+    p0 = { {  -0.9f, -0.8f, 0.f }, { 1.f, 0.f, 1.f, 1.f } };
+    p1 = { {  -0.9f,  0.9f, 0.f }, { 1.f, 1.f, 0.f, 1.f } };
+    p2 = { {   0.8f,  0.9f, 0.f }, { 0.f, 1.f, 1.f, 1.f } };
+
+    TriangleF t1{ p0, p1, p2 };
+
+    float aspect = (float)DEFAULT_WINDOW_WIDTH / (float)DEFAULT_WINDOW_HEIGHT;
+    float fov = 45.f / 180.f * F_PI;
+    float n = 0.01f;
+    float f = 100.f;
+
+    // Camera Transform :
+    float cameraPitch = 0.f;
+    float cameraRoll = 0.f;
+    float cameraYaw = 0.f;
+    TransformF cameraPosition(
+        { 0.f, 0.f, -10.f }
+        , { cameraPitch, cameraRoll, cameraYaw }
+        , { 1.f, 1.f, 1.f }
+    );
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -55,8 +102,14 @@ int main(int argc, int **argv)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    // Start clock
+    slgClock clock;
+    double dTime = clock.restart();
+
     while (!glfwWindowShouldClose(window))
     {
+        dTime = clock.restart();
+
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
@@ -106,13 +159,33 @@ int main(int argc, int **argv)
             ImGui::End();
         }
 
+        // update scene
+        cameraPitch += dTime;
+        //cameraYaw += dTime;
+        cameraPosition.rotation = QuatF({ F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f });
+
+        Mat4F P = Mat4F::MakeProjection(aspect, fov, n, f);
+        Mat4F V(cameraPosition);
+        //V = Mat4F::Identity();
+        Mat4F M = Mat4F({ {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
+        //M = Mat4F::Identity();
+        Mat4F M2 = Mat4F({ {0.f, 0.f, -20.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
+
+        auto MVP = P * (V * M);
+        auto MVP2 = P * (V * M2);
+
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        t0.render(MVP2);
+        t1.render(MVP);
+
         // Rendering
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        aspect = (float)display_w / (float)display_h;
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
