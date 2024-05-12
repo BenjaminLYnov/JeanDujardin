@@ -9,6 +9,7 @@
 #include "lib/Math/Vertex.h"
 #include "lib/Clock/lsgClock.h"
 #include "Geometries/Triangle.h"
+#include "Geometries/Plane.h"
 
 #include <cmath>
 #include <array>
@@ -57,32 +58,29 @@ int main(int argc, int **argv)
 
     // Setup scene
 
-    VertexF p0{ {  -0.8f, -0.9f, 0.f }, {  -0.8f, -0.9f, 0.f }, { 1.f, 0.f, 0.f, 1.f } };
-    VertexF p1{ {   0.9f, -0.9f, 0.f }, {   0.9f, -0.9f, 0.f }, { 0.f, 1.f, 0.f, 1.f } };
-    VertexF p2{ {   0.9f,  0.8f, 0.f }, {   0.9f,  0.8f, 0.f }, { 0.f, 0.f, 1.f, 1.f } };
-
-    TriangleF t0{ p0, p1, p2 };
-
-    p0 = { {  -0.9f, -0.8f, 0.f }, {  -0.9f, -0.8f, 0.f }, { 1.f, 0.f, 1.f, 1.f } };
-    p1 = { {  -0.9f,  0.9f, 0.f }, {  -0.9f,  0.9f, 0.f }, { 1.f, 1.f, 0.f, 1.f } };
-    p2 = { {   0.8f,  0.9f, 0.f }, {   0.8f,  0.9f, 0.f }, { 0.f, 1.f, 1.f, 1.f } };
-
-    TriangleF t1{ p0, p1, p2 };
-
     float aspect = (float)DEFAULT_WINDOW_WIDTH / (float)DEFAULT_WINDOW_HEIGHT;
     float fov = 45.f / 180.f * F_PI;
     float n = 0.01f;
     float f = 100.f;
 
     // Camera Transform :
-    float cameraPitch = 0.f;
+    float cameraPitch = -5.f;
     float cameraRoll = 0.f;
     float cameraYaw = 0.f;
     TransformF cameraPosition(
-        { 0.f, 0.f, -10.f }
+        { 0.f, -10.f, -10.f }
         , { cameraPitch, cameraRoll, cameraYaw }
         , { 1.f, 1.f, 1.f }
     );
+
+    // plane transform
+    TransformF planeTransform(
+        { 0.f, 0.f, 0.f }
+        , { 0.f, 0.f, 0.f }
+        , { 1.f, 1.f, 1.f }
+    );
+
+    PlaneF plane1(planeTransform, 10);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -99,7 +97,7 @@ int main(int argc, int **argv)
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Our state
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -161,19 +159,12 @@ int main(int argc, int **argv)
         }
 
         // update scene
-        cameraPitch += dTime;
+        //cameraPitch += dTime;
         //cameraYaw += dTime;
         cameraPosition.rotation = QuatF({ F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f });
 
         Mat4F P = Mat4F::MakeProjection(aspect, fov, n, f);
         Mat4F V(cameraPosition);
-        //V = Mat4F::Identity();
-        Mat4F M = Mat4F({ {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
-        //M = Mat4F::Identity();
-        Mat4F M2 = Mat4F({ {0.f, 0.f, -20.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
-
-        auto MVP = P * (V * M);
-        auto MVP2 = P * (V * M2);
 
         //  Clear window
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -181,8 +172,7 @@ int main(int argc, int **argv)
 
         // Rendering
 
-        t0.render(MVP2);
-        t1.render(MVP);
+        plane1.render(V, P);
 
         ImGui::Render();
         int display_w, display_h;
