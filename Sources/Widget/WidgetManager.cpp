@@ -1,4 +1,5 @@
 #include "WidgetManager.h"
+#include <iostream>
 
 UWidgetManager::UWidgetManager()
 {
@@ -10,4 +11,16 @@ void UWidgetManager::DisplayWidgets()
     {
         Widget->Display();
     }
+}
+
+void UWidgetManager::AddWidget(std::unique_ptr<UWidget> NewWidget)
+{
+    if (!NewWidget)
+        return;
+    Widgets.emplace_back(std::move(NewWidget));
+}
+
+void UWidgetManager::CallOnChange()
+{
+    OnChange.Broadcast();
 }

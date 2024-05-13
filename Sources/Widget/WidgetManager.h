@@ -6,23 +6,35 @@
 #include "Widget.h"
 #include <vector>
 #include <memory>
+#include "Events/Deleguate.h"
 
 class UWidgetManager
 {
 public:
     UWidgetManager();
 
-    std::vector<std::unique_ptr<UWidget>> Widgets;
+    void DisplayWidgets();
+
+    UDeleguate OnChange;
+
+    void AddWidget(std::unique_ptr<UWidget> NewWidget);
 
     template <typename WidgetType, typename... Args>
     void AddWidget(Args &&...args)
     {
-        Widgets.emplace_back(std::make_unique<WidgetType>(std::forward<Args>(args)...));
+        std::unique_ptr<UWidget> NewWidget = std::make_unique<WidgetType>(std::forward<Args>(args)...);
+
+        if (!NewWidget)
+            return;
+
+        NewWidget->OnChange.AddCallback(this, &UWidgetManager::CallOnChange);
+        Widgets.emplace_back(std::move(NewWidget));
     }
 
-    void DisplayWidgets();
-
 private:
+    std::vector<std::unique_ptr<UWidget>> Widgets;
+
+    void CallOnChange();
 };
 
 #endif

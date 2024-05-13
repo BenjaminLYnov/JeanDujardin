@@ -4,12 +4,16 @@
 #pragma once
 
 #include <string>
+#include "Events/Deleguate.h"
 
 // Classe de base abstraite pour les widgets
-class UWidget {
+class UWidget
+{
 public:
     virtual ~UWidget() = default;
-    virtual void Display() = 0;  // Méthode virtuelle pure pour afficher le widget
+    virtual void Display() = 0; // Méthode virtuelle pure pour afficher le widget
+
+    UDeleguate OnChange;
 };
 
 #endif

@@ -6,5 +6,8 @@ UBooleanCheckbox::UBooleanCheckbox(const std::string label, bool *value)
 
 void UBooleanCheckbox::Display()
 {
-    ImGui::Checkbox(label.c_str(), value);
+    if (ImGui::Checkbox(label.c_str(), value))
+    {
+        OnChange.Broadcast();
+    }
 }

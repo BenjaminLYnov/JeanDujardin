@@ -17,6 +17,8 @@ public:
     float max;
 
 private:
+    // float Previous
+
 };
 
 #endif

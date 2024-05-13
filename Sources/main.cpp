@@ -13,11 +13,13 @@
 #include <cmath>
 #include <array>
 
-#include "Widget/WidgetManager.h"
-#include "Widget/Partials/FloatSlider.h"
-#include "Widget/Partials/BooleanCheckbox.h"
-
 #include <memory> // Pour std::unique_ptr
+
+//
+#include "ConfigManager/ConfigManager.h"
+#include "ExampleUses/FirstExample.h"
+#include "ExampleUses/SecondExample.h"
+//
 
 const unsigned DEFAULT_WINDOW_WIDTH = 800;
 const unsigned DEFAULT_WINDOW_HEIGHT = 600;
@@ -110,25 +112,17 @@ int main(int argc, char **argv)
     slgClock clock;
     double dTime = clock.restart();
 
+    ////////////////////////////////////////////////////////////////
     // Init Widget manager
-    std::unique_ptr<UWidgetManager> WidgetManager = std::make_unique<UWidgetManager>();
+    auto Config = UConfigManager::GetInstance();
+    AFirstExample FirstExample;
+    ASecondExample SecondExample;
+    ////////////////////////////////////////////////////////////////
     
-    float NbVertice = 0;
-    // float AnotherThing = new float(0);
-    float AnotherThing = 0;
-    float Zoom = 0;
-    // bool* bEnableShadow = new bool(true);
-    bool bEnableShadow = true;
-
-    WidgetManager->AddWidget<UFloatSlider>("Nombre de vertice", &NbVertice, 0.0f, 100.0f);
-    WidgetManager->AddWidget<UFloatSlider>("Autre chose", &AnotherThing, 0.0f, 100.0f);
-    WidgetManager->AddWidget<UFloatSlider>("Zoom", &Zoom, -100.0f, 100.0f);
-    WidgetManager->AddWidget<UBooleanCheckbox>("Enable Shadows", &bEnableShadow);
 
     // Game Loop
     while (!glfwWindowShouldClose(window))
     {
-        std::cout << Zoom << "\n";
         dTime = clock.restart();
 
         // Poll and handle events (inputs, window resize, etc.)
@@ -147,7 +141,7 @@ int main(int argc, char **argv)
         glClear(GL_COLOR_BUFFER_BIT);
 
         // IMPORTANT
-        WidgetManager->DisplayWidgets();
+        Config->DisplayWidgets();
 
         // Rendering
         ImGui::Render();
