@@ -5,6 +5,7 @@
 #include "lib/Math/Vertex.h"
 #include "lib/Math/MathMatrix.h"
 #include "lib/Math/Transform.h"
+#include "lib/Math/Noise.h"
 
 #include <GL/glew.h>
 
@@ -37,10 +38,26 @@ struct Plane {
                 Color4<T> color = { 0.3f, 0.3f + 0.35f*((float)i / (float)gridSize) + 0.35f*((float)j / (float)gridSize), 0.3f, 1.f };
 
                 // points of the square
-                Point3d<T> ul = { i * sqSize - originOffset, 0.f, j * sqSize - originOffset };
-                Point3d<T> ur = { (i+1) * sqSize - originOffset, 0.f , j * sqSize - originOffset };
-                Point3d<T> ll = { i * sqSize - originOffset, 0.f , (j + 1) * sqSize - originOffset };
-                Point3d<T> lr = { (i + 1) * sqSize - originOffset, 0.f , (j+1) * sqSize - originOffset };
+                Point3d<T> ul = {
+                    i * sqSize - originOffset,
+                    perlin(i * sqSize, j * sqSize),
+                    j * sqSize - originOffset
+                };
+                Point3d<T> ur = { 
+                    (i+1) * sqSize - originOffset, 
+                    perlin((i + 1) * sqSize, j * sqSize),
+                    j * sqSize - originOffset 
+                };
+                Point3d<T> ll = {
+                    i * sqSize - originOffset,
+                    perlin(i * sqSize, (j + 1) * sqSize),
+                    (j + 1) * sqSize - originOffset
+                };
+                Point3d<T> lr = { 
+                    (i + 1) * sqSize - originOffset, 
+                    perlin((i + 1) * sqSize, (j + 1) * sqSize),
+                    (j+1) * sqSize - originOffset 
+                };
 
                 // vertices of the square
                 vertex_type t1v1 = { ul, normal, color };
@@ -117,6 +134,6 @@ public:
     Transform<T> transform;
 };
 
-using PlaneF = Plane<float>;
+using PlaneF = Plane<float, 100>;
 
 #endif // !PLANE_H

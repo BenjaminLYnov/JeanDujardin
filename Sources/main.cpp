@@ -80,7 +80,7 @@ int main(int argc, int **argv)
         , { 1.f, 1.f, 1.f }
     );
 
-    PlaneF plane1(planeTransform, 10);
+    PlaneF* plane1 = new PlaneF(planeTransform, 10);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -172,7 +172,7 @@ int main(int argc, int **argv)
 
         // Rendering
 
-        plane1.render(V, P);
+        plane1->render(V, P);
 
         ImGui::Render();
         int display_w, display_h;
@@ -191,6 +191,8 @@ int main(int argc, int **argv)
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete plane1;
 
     return 0;
 }
