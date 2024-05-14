@@ -50,6 +50,7 @@ template<typename T>
 struct Vertex
 {
     Point3d<T> position;
+    Point3d<T> normal;
     Color4<T> color;
 };
 using VertexF = Vertex<float>;
