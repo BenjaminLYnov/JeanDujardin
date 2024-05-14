@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VERTEX_H
+#define VERTEX_H
 
 #include "MathVector.h"
 
@@ -53,4 +54,7 @@ struct Vertex
     Point3d<T> normal;
     Color4<T> color;
 };
+
 using VertexF = Vertex<float>;
+
+#endif // VERTEX_H

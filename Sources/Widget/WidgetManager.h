@@ -1,17 +1,17 @@
 #ifndef WIDGETMANAGER_H
 #define WIDGETMANAGER_H
 
-#pragma once
-
 #include "Widget.h"
+#include "Events/Deleguate.h"
+
 #include <vector>
 #include <memory>
-#include "Events/Deleguate.h"
 
 class UWidgetManager
 {
 public:
     UWidgetManager();
+    ~UWidgetManager();
 
     void DisplayWidgets();
 

@@ -1,8 +1,6 @@
 #ifndef FIRSTEXAMPLE_H
 #define FIRSTEXAMPLE_H
 
-#pragma once
-
 class UConfigManager;
 
 class AFirstExample
@@ -14,9 +12,7 @@ public:
     void Update();
 
 private:
-
     UConfigManager *Config;
-
 
 };
 

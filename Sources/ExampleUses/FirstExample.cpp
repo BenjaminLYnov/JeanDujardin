@@ -3,9 +3,8 @@
 #include <iostream>
 
 AFirstExample::AFirstExample()
+	: Config(UConfigManager::GetInstance())
 {
-    Config = UConfigManager::GetInstance();
-
     if (Config)
     {
         Config->OnNbVerticeChange.AddCallback(this, &AFirstExample::Update);
@@ -20,5 +19,6 @@ void AFirstExample::Update()
 {
     if (!Config)
         return;
+
     std::cout << Config->NbVertice << "\n";
 }

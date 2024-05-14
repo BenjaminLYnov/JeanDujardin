@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATH_VECTOR_H
+#define MATH_VECTOR_H
 
 #include "lib/Logger/logger.h"
 
@@ -39,4 +40,7 @@ struct Vec4
     T z;
     T w;
 };
+
 using Vec4F = Vec4<float>;
+
+#endif // MATH_VECTOR_H

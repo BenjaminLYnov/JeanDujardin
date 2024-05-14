@@ -3,9 +3,8 @@
 #include <iostream>
 
 ASecondExample::ASecondExample()
+    : Config(UConfigManager::GetInstance())
 {
-   Config = UConfigManager::GetInstance();
-
     if (Config)
     {
         Config->OnZoomChange.AddCallback(this, &ASecondExample::OnUpdateZoom);
@@ -22,6 +21,7 @@ void ASecondExample::OnUpdateZoom()
 {
     if (!Config)
         return;
+
     std::cout << Config->Zoom << "\n";
 }
 
@@ -29,5 +29,6 @@ void ASecondExample::OnUpdateEnableShadow()
 {
     if (!Config)
         return;
+
     std::cout << Config->bEnableShadow << "\n";
 }

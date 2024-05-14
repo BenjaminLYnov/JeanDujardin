@@ -1,10 +1,9 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#pragma once
+#include "Events/Deleguate.h"
 
 #include <string>
-#include "Events/Deleguate.h"
 
 // Classe de base abstraite pour les widgets
 class UWidget

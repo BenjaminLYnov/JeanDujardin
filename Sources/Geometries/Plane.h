@@ -8,7 +8,6 @@
 #include "lib/Math/Noise.h"
 
 #include <GL/glew.h>
-
 #include <array>
 
 const int POINTS_PER_TRIANGLE = 3;
@@ -18,11 +17,15 @@ template<typename T>
 class Mat4;
 
 template<typename T, int gridSize = 10>
-struct Plane {
+struct Plane 
+{
     using vertex_type = Vertex<T>;
 
-    Plane(const Transform<T>& _transform, const T& size) :
-        transform(_transform), m_vao(0), m_vbo(0), m_program(0)
+    Plane(const Transform<T>& _transform, const T& size) 
+        : transform(_transform)
+        , m_vao(0)
+        , m_vbo(0)
+        , m_program(0)
     {
         T sqSize = size / gridSize;
         T originOffset = size / 2;
@@ -94,8 +97,8 @@ struct Plane {
         glBufferData(GL_ARRAY_BUFFER, sizeof(m_points), m_points.data(), GL_STATIC_DRAW);
 
         ShaderInfo shaders[] = {
-            {GL_VERTEX_SHADER, "..\\ressources\\Plane.vert"},
-            {GL_FRAGMENT_SHADER, "..\\ressources\\Plane.frag"},
+            {GL_VERTEX_SHADER, "ressources/plane.vert"},
+            {GL_FRAGMENT_SHADER, "ressources/plane.frag"},
             {GL_NONE, nullptr}
         };
 
@@ -112,7 +115,8 @@ struct Plane {
         glEnableVertexAttribArray(2);
     }
 
-    void render(const Mat4<T>& view, const Mat4<T>& projection) {
+    void render(const Mat4<T>& view, const Mat4<T>& projection) 
+    {
         glBindVertexArray(m_vao);
 
         Mat4F model(transform);
@@ -130,8 +134,10 @@ private:
     GLuint m_vao;
     GLuint m_vbo;
     GLuint m_program;
+
 public:
     Transform<T> transform;
+
 };
 
 using PlaneF = Plane<float, 100>;

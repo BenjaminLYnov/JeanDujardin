@@ -1,13 +1,12 @@
 #ifndef FLOATSLIDER_H
 #define FLOATSLIDER_H
 
-#pragma once
-#include "../Widget.h"
+#include "Widget/Widget.h"
 
 class UFloatSlider : public UWidget
 {
 public:
-    UFloatSlider(const std::string label, float *value, float min, float max);
+    UFloatSlider(const std::string &label, float *value, float min, float max);
 
     void Display() override;
 

@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include <math.h>
-#include "SFML/Graphics.hpp"
+// #include "SFML/Graphics.hpp" ?? How you see SFML is in a project ?? 
 
-
-typedef struct {
+typedef struct 
+{
     float x, y;
 } vector2;
 
-vector2 randomGradient(int ix, int iy) {
+vector2 randomGradient(int ix, int iy) 
+{
     // No precomputed gradients mean this works for any number of grid coordinates
     const unsigned w = 8 * sizeof(unsigned);
     const unsigned s = w / 2;
@@ -33,7 +34,8 @@ vector2 randomGradient(int ix, int iy) {
 }
 
 // Computes the dot product of the distance and gradient vectors.
-float dotGridGradient(int ix, int iy, float x, float y) {
+float dotGridGradient(int ix, int iy, float x, float y) 
+{
     // Get gradient from integer coordinates
     vector2 gradient = randomGradient(ix, iy);
 
@@ -50,9 +52,9 @@ float interpolate(float a0, float a1, float w)
     return (a1 - a0) * (3.0 - w * 2.0) * w * w + a0;
 }
 
-
 // Sample Perlin noise at coordinates x, y
-float perlin(float x, float y) {
+float perlin(float x, float y) 
+{
 
     // Determine grid cell corner coordinates
     int x0 = (int)x;
@@ -80,4 +82,4 @@ float perlin(float x, float y) {
     return value;
 }
 
-#endif // !NOISE_H
+#endif // NOISE_H
