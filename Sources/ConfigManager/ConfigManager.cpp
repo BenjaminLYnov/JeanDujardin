@@ -17,23 +17,20 @@ UConfigManager::UConfigManager()
 
 void UConfigManager::InitNbVertice()
 {
-    std::unique_ptr<UFloatSlider> FS = std::make_unique<UFloatSlider>("Nombre de vertice", &NbVertice, 0.0f, 100.0f);
-    FS->OnChange.AddCallback(this, &UConfigManager::CallNbVerticeChange);
-    AddWidget(std::move(FS));
+    std::unique_ptr<UFloatSlider> Widget = std::make_unique<UFloatSlider>("Nombre de vertice", &NbVertice, 0.0f, 100.0f);
+    InitWidget(std::move(Widget), this, &UConfigManager::CallNbVerticeChange);
 }
 
 void UConfigManager::InitZoom()
 {
-    std::unique_ptr<UFloatSlider> FS = std::make_unique<UFloatSlider>("Zoom", &Zoom, 0.0f, 100.0f);
-    FS->OnChange.AddCallback(this, &UConfigManager::CallZoomChange);
-    AddWidget(std::move(FS));
+    std::unique_ptr<UFloatSlider> Widget = std::make_unique<UFloatSlider>("Zoom", &Zoom, 0.0f, 100.0f);
+    InitWidget(std::move(Widget), this, &UConfigManager::CallZoomChange);
 }
 
 void UConfigManager::InitEnableShadow()
 {
-    std::unique_ptr<UBooleanCheckbox> FS = std::make_unique<UBooleanCheckbox>("Enable Shadows", &bEnableShadow);
-    FS->OnChange.AddCallback(this, &UConfigManager::CallEnableShadowChange);
-    AddWidget(std::move(FS));
+    std::unique_ptr<UBooleanCheckbox> Widget = std::make_unique<UBooleanCheckbox>("Enable Shadows", &bEnableShadow);
+    InitWidget(std::move(Widget), this, &UConfigManager::CallEnableShadowChange);
 }
 
 // PRIVATE

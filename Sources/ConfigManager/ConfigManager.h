@@ -38,6 +38,13 @@ public:
 protected:
     UConfigManager(); // Constructeur privé
 
+    template <typename T, typename Method>
+    void InitWidget(std::unique_ptr<UWidget> Widget, T *Obj, Method MethodToBind)
+    {
+        Widget->OnChange.AddCallback(this, MethodToBind);
+        AddWidget(std::move(Widget));
+    };
+
     virtual void InitNbVertice();
     virtual void InitZoom();
     virtual void InitEnableShadow();
