@@ -1,8 +1,6 @@
 #ifndef PLANE_H
 #define PLANE_H
 
-#pragma once
-
 #include "Shader/Shader.h"
 #include "lib/Math/Vertex.h"
 #include "lib/Math/MathMatrix.h"
@@ -14,6 +12,15 @@
 
 const int POINTS_PER_TRIANGLE = 3;
 const int TRIANGLES_PER_SQUARE = 2;
+
+#ifndef NDEBUG
+const char* VERTEX_SHADER = "..\\ressources\\plane.vert";
+const char* FRAGMENT_SHADER = "..\\ressources\\plane.frag";
+#else
+const char* VERTEX_SHADER = "ressources/plane.vert";
+const char* FRAGMENT_SHADER = "ressources/plane.frag";
+#endif // DEBUG
+
 
 template<typename T>
 class Mat4;
@@ -47,8 +54,8 @@ struct Plane
         glBufferData(GL_ARRAY_BUFFER, sizeof(m_points), m_points.data(), GL_STATIC_DRAW);
 
         ShaderInfo shaders[] = {
-            {GL_VERTEX_SHADER, "..\\ressources\\plane.vert"},
-            {GL_FRAGMENT_SHADER, "..\\ressources\\plane.frag"},
+            {GL_VERTEX_SHADER, VERTEX_SHADER},
+            {GL_FRAGMENT_SHADER, FRAGMENT_SHADER},
             {GL_NONE, nullptr}
         };
 
