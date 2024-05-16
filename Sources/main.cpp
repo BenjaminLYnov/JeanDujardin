@@ -19,8 +19,7 @@
 const unsigned DEFAULT_WINDOW_WIDTH = 800;
 const unsigned DEFAULT_WINDOW_HEIGHT = 600;
 
-
-static void glfw_error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char *description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
@@ -43,13 +42,13 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    //Setup GLEW
+    // Setup GLEW
     glewExperimental = GL_TRUE;
     if (glewInit())
     {
@@ -64,23 +63,15 @@ int main(int argc, char **argv)
     float f = 100.f;
 
     // Camera Transform :
-    float cameraPitch = -5.f;
-    float cameraRoll = 0.f;
-    float cameraYaw = 0.f;
-    TransformF cameraPosition(
-        { 0.f, -10.f, -10.f }
-        , { cameraPitch, cameraRoll, cameraYaw }
-        , { 1.f, 1.f, 1.f }
-    );
+ 
+    TransformF cameraTransform(
+        {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f});
 
     // plane transform
     TransformF planeTransform(
-        { 0.f, 0.f, 0.f }
-        , { 0.f, 0.f, 0.f }
-        , { 1.f, 1.f, 1.f }
-    );
+        {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f});
 
-    PlaneF* plane1 = new PlaneF(planeTransform, 10);
+    PlaneF *plane1 = new PlaneF(planeTransform, 10);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -106,6 +97,8 @@ int main(int argc, char **argv)
     slgClock clock;
     double dTime = clock.restart();
 
+    auto Config = UConfigManager::GetInstance();
+
     while (!glfwWindowShouldClose(window))
     {
         dTime = clock.restart();
@@ -125,13 +118,15 @@ int main(int argc, char **argv)
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        Config->DisplayWidgets();
+
         // IMPORTANT
         // Confi->DisplayWidgets();
 
         // 3. Show another simple window.
         if (show_another_window)
         {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Begin("Another Window", &show_another_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
             ImGui::Text("Hello from another window!");
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
@@ -139,20 +134,34 @@ int main(int argc, char **argv)
         }
 
         // update scene
-        //cameraPitch += dTime;
-        //cameraYaw += dTime;
-        cameraPosition.rotation = QuatF({ F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f });
+        // cameraPitch += dTime;
+        // cameraYaw += dTime;
+        cameraTransform = TransformF(
+            {Config->CameraLocationX, Config->CameraLocationY, Config->CameraLocationZ},
+            {Config->CameraRotationPitch, Config->CameraRotationRoll, Config->CameraRotationYaw},
+            {Config->CameraScaleX, Config->CameraScaleY, Config->CameraScaleZ});
+
+        // cameraTransform.rotation = QuatF({F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f});
 
         Mat4F P = Mat4F::MakeProjection(aspect, fov, n, f);
-        Mat4F V(cameraPosition);
+        Mat4F V(cameraTransform);
+
+        planeTransform = TransformF(
+            {Config->PlaneLocationX, Config->PlaneLocationY, Config->PlaneLocationZ},
+            {Config->PlaneRotationPitch, Config->PlaneRotationRoll, Config->PlaneRotationYaw},
+            {Config->PlaneScaleX, Config->PlaneScaleY, Config->PlaneScaleZ});
+        // {Config->CameraLocationX, Config->CameraLocationY, Config->CameraLocationZ}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f});
+
+        plane1->transform = planeTransform;
 
         //  Clear window
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Rendering
-
         plane1->render(V, P);
+
+        //    std::cout << Config->CameraLocationX << "\n";
 
         ImGui::Render();
         int display_w, display_h;

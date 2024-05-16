@@ -31,6 +31,9 @@ public:
         Widgets.emplace_back(std::move(NewWidget));
     }
 
+    virtual void CreateAndAddWidgetFloat(const std::string Name, float &Value, const float Min, const float Max);
+
+
 private:
     std::vector<std::unique_ptr<UWidget>> Widgets;
 
