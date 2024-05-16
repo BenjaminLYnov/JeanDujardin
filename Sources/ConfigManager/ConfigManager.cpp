@@ -2,7 +2,7 @@
 
 #include "Widget/Partials/FloatSlider.h"
 #include "Widget/Partials/BooleanCheckbox.h"
-
+#include "lib/Math/KMath.h"
 #include <iostream>
 
 UConfigManager *UConfigManager::Instance{nullptr};
@@ -10,44 +10,33 @@ std::mutex UConfigManager::Mutex;
 
 UConfigManager::UConfigManager()
 {
-    InitNbVertice();
-    InitZoom();
-    InitEnableShadow();
+    InitCamera();
+    InitPlane();
+    // InitNbVertice();
+    // InitZoom();
+    // InitEnableShadow();
 }
 
 // PROTECTED
 
-void UConfigManager::InitNbVertice()
+void UConfigManager::InitCamera()
 {
-    std::unique_ptr<UFloatSlider> Widget = std::make_unique<UFloatSlider>("Nombre de vertice", &NbVertice, 0.0f, 100.0f);
-    InitWidget(std::move(Widget), this, &UConfigManager::CallNbVerticeChange);
+    CreateAndAddWidgetFloat("CameraLocationX", CameraLocationX, -50.0f, 50.0f);
+    CreateAndAddWidgetFloat("CameraLocationY", CameraLocationY, -50.0f, 50.0f);
+    CreateAndAddWidgetFloat("CameraLocationZ", CameraLocationZ, -50.0f, 50.0f);
+
+    CreateAndAddWidgetFloat("CameraRotationPitch", CameraRotationPitch, -1.0f * F_PI, 1.0f * F_PI);
+    CreateAndAddWidgetFloat("CameraRotationRoll", CameraRotationRoll, -1.0f * F_PI, 1.0f * F_PI);
+    CreateAndAddWidgetFloat("CameraRotationYaw", CameraRotationYaw, -1.0f * F_PI, 1.0f * F_PI);
 }
 
-void UConfigManager::InitZoom()
+void UConfigManager::InitPlane()
 {
-    std::unique_ptr<UFloatSlider> Widget = std::make_unique<UFloatSlider>("Zoom", &Zoom, 0.0f, 100.0f);
-    InitWidget(std::move(Widget), this, &UConfigManager::CallZoomChange);
-}
+    CreateAndAddWidgetFloat("PlaneRotationPitch", PlaneRotationPitch, -1.0f * F_PI, 1.0f * F_PI);
+    CreateAndAddWidgetFloat("PlaneRotationRoll", PlaneRotationRoll, -1.0f * F_PI, 1.0f * F_PI);
+    CreateAndAddWidgetFloat("PlaneRotationYaw", PlaneRotationYaw, -1.0f * F_PI, 1.0f * F_PI);
 
-void UConfigManager::InitEnableShadow()
-{
-    std::unique_ptr<UBooleanCheckbox> Widget = std::make_unique<UBooleanCheckbox>("Enable Shadows", &bEnableShadow);
-    InitWidget(std::move(Widget), this, &UConfigManager::CallEnableShadowChange);
-}
-
-// PRIVATE
-
-void UConfigManager::CallNbVerticeChange()
-{
-    OnNbVerticeChange.Broadcast();
-}
-
-void UConfigManager::CallZoomChange()
-{
-    OnZoomChange.Broadcast();
-}
-
-void UConfigManager::CallEnableShadowChange()
-{
-    OnEnableShadowChange.Broadcast();
+    CreateAndAddWidgetFloat("PlaneScaleX", PlaneScaleX, 0.0f, 10.0f);
+    CreateAndAddWidgetFloat("PlaneScaleY", PlaneScaleY, 0.0f, 10.0f);
+    CreateAndAddWidgetFloat("PlaneScaleZ", PlaneScaleZ, 0.0f, 10.0f);
 }

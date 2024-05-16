@@ -1,6 +1,8 @@
 #ifndef PLANE_H
 #define PLANE_H
 
+#pragma once
+
 #include "Shader/Shader.h"
 #include "lib/Math/Vertex.h"
 #include "lib/Math/MathMatrix.h"
