@@ -25,9 +25,9 @@ public:
 
     float CameraLocationX = 0;
     float CameraLocationY = 0;
-    float CameraLocationZ = 0;
+    float CameraLocationZ = -15;
 
-    float CameraRotationPitch = 0;
+    float CameraRotationPitch = 0.78; // PI/4
     float CameraRotationRoll = 0;
     float CameraRotationYaw = 0;
 
@@ -46,6 +46,8 @@ public:
     float PlaneScaleX = 1;
     float PlaneScaleY = 1;
     float PlaneScaleZ = 1;
+
+    float PlaneSize = 10.f;
 
     // Les variablees
     // float NbVertice = 0;

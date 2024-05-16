@@ -23,12 +23,72 @@ struct Plane
 {
     using vertex_type = Vertex<T>;
 
-    Plane(const Transform<T>& _transform, const T& size) 
+    Plane(const Transform<T>& _transform, const T& _size) 
         : transform(_transform)
         , m_vao(0)
         , m_vbo(0)
         , m_program(0)
+        , size(_size)
     {
+        _computePoints(false);
+        load();
+    }
+
+    ~Plane() {}
+
+    void load()
+    {
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
+
+        glGenBuffers(1, &m_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(m_points), m_points.data(), GL_STATIC_DRAW);
+
+        ShaderInfo shaders[] = {
+            {GL_VERTEX_SHADER, "..\\ressources\\plane.vert"},
+            {GL_FRAGMENT_SHADER, "..\\ressources\\plane.frag"},
+            {GL_NONE, nullptr}
+        };
+
+        m_program = Shader::loadShaders(shaders);
+
+        glUseProgram(m_program);
+
+        // only works for T = float :shrug:
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_type), 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_type), reinterpret_cast<char*>(nullptr) + sizeof(vertex_type::position));
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_type), reinterpret_cast<char*>(nullptr) + sizeof(vertex_type::position) * 2);
+        glEnableVertexAttribArray(2);
+    }
+
+    void render(const Mat4<T>& view, const Mat4<T>& projection) 
+    {
+        _computePoints();
+        glBindVertexArray(m_vao);
+
+        Mat4F model(transform);
+
+        Mat4F MVP = projection * view * model;
+
+        GLuint mvpLocation = glGetUniformLocation(m_program, "MVP");
+        glUniformMatrix4fv(mvpLocation, 1, 0, MVP.data());
+
+        glDrawArrays(GL_TRIANGLES, 0, int(m_points.size()));
+    }
+
+private:
+    std::array<vertex_type, (gridSize * gridSize * POINTS_PER_TRIANGLE * TRIANGLES_PER_SQUARE)> m_points;
+    GLuint m_vao;
+    GLuint m_vbo;
+    GLuint m_program;
+
+    void _computePoints(bool setBufferData = true)
+    {
+
         T sqSize = size / gridSize;
         T originOffset = size / 2;
 
@@ -40,7 +100,7 @@ struct Plane
             {
                 int coordinatesInGrid = (POINTS_PER_TRIANGLE * TRIANGLES_PER_SQUARE) * (i + gridSize * j);
 
-                Color4<T> color = { 0.3f, 0.3f + 0.35f*((float)i / (float)gridSize) + 0.35f*((float)j / (float)gridSize), 0.3f, 1.f };
+                Color4<T> color = { 0.3f, 0.3f + 0.35f * ((float)i / (float)gridSize) + 0.35f * ((float)j / (float)gridSize), 0.3f, 1.f };
 
                 // points of the square
                 Point3d<T> ul = {
@@ -48,20 +108,20 @@ struct Plane
                     perlin(i * sqSize, j * sqSize),
                     j * sqSize - originOffset
                 };
-                Point3d<T> ur = { 
-                    (i+1) * sqSize - originOffset, 
+                Point3d<T> ur = {
+                    (i + 1) * sqSize - originOffset,
                     perlin((i + 1) * sqSize, j * sqSize),
-                    j * sqSize - originOffset 
+                    j * sqSize - originOffset
                 };
                 Point3d<T> ll = {
                     i * sqSize - originOffset,
                     perlin(i * sqSize, (j + 1) * sqSize),
                     (j + 1) * sqSize - originOffset
                 };
-                Point3d<T> lr = { 
-                    (i + 1) * sqSize - originOffset, 
+                Point3d<T> lr = {
+                    (i + 1) * sqSize - originOffset,
                     perlin((i + 1) * sqSize, (j + 1) * sqSize),
-                    (j+1) * sqSize - originOffset 
+                    (j + 1) * sqSize - originOffset
                 };
 
                 // vertices of the square
@@ -83,62 +143,18 @@ struct Plane
                 m_points[coordinatesInGrid + 5] = t2v3;
             }
         }
-        load();
+
+        if (setBufferData) {
+
+            glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+            glBufferData(GL_ARRAY_BUFFER, sizeof(m_points), m_points.data(), GL_STATIC_DRAW);
+        }
     }
-
-    ~Plane() {}
-
-    void load()
-    {
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(m_points), m_points.data(), GL_STATIC_DRAW);
-
-        ShaderInfo shaders[] = {
-            {GL_VERTEX_SHADER, "ressources/plane.vert"},
-            {GL_FRAGMENT_SHADER, "ressources/plane.frag"},
-            {GL_NONE, nullptr}
-        };
-
-        m_program = Shader::loadShaders(shaders);
-
-        glUseProgram(m_program);
-
-        // only works for T = float :shrug:
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_type), 0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_type), reinterpret_cast<char*>(nullptr) + sizeof(vertex_type::position));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_type), reinterpret_cast<char*>(nullptr) + sizeof(vertex_type::position) * 2);
-        glEnableVertexAttribArray(2);
-    }
-
-    void render(const Mat4<T>& view, const Mat4<T>& projection) 
-    {
-        glBindVertexArray(m_vao);
-
-        Mat4F model(transform);
-
-        Mat4F MVP = projection * view * model;
-
-        GLuint mvpLocation = glGetUniformLocation(m_program, "MVP");
-        glUniformMatrix4fv(mvpLocation, 1, 0, MVP.data());
-
-        glDrawArrays(GL_TRIANGLES, 0, int(m_points.size()));
-    }
-
-private:
-    std::array<vertex_type, (gridSize * gridSize * POINTS_PER_TRIANGLE * TRIANGLES_PER_SQUARE)> m_points;
-    GLuint m_vao;
-    GLuint m_vbo;
-    GLuint m_program;
 
 public:
     Transform<T> transform;
+    T size;
 
 };
 

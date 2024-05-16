@@ -32,6 +32,10 @@ void UConfigManager::InitCamera()
 
 void UConfigManager::InitPlane()
 {
+    CreateAndAddWidgetFloat("PlaneLocationX", PlaneLocationX, -10.0f, 10.0f);
+    CreateAndAddWidgetFloat("PlaneLocationY", PlaneLocationY, -10.0f, 10.0f);
+    CreateAndAddWidgetFloat("PlaneLocationZ", PlaneLocationZ, -10.0f, 10.0f);
+
     CreateAndAddWidgetFloat("PlaneRotationPitch", PlaneRotationPitch, -1.0f * F_PI, 1.0f * F_PI);
     CreateAndAddWidgetFloat("PlaneRotationRoll", PlaneRotationRoll, -1.0f * F_PI, 1.0f * F_PI);
     CreateAndAddWidgetFloat("PlaneRotationYaw", PlaneRotationYaw, -1.0f * F_PI, 1.0f * F_PI);
@@ -39,4 +43,6 @@ void UConfigManager::InitPlane()
     CreateAndAddWidgetFloat("PlaneScaleX", PlaneScaleX, 0.0f, 10.0f);
     CreateAndAddWidgetFloat("PlaneScaleY", PlaneScaleY, 0.0f, 10.0f);
     CreateAndAddWidgetFloat("PlaneScaleZ", PlaneScaleZ, 0.0f, 10.0f);
+
+    CreateAndAddWidgetFloat("PlaneSize", PlaneSize, 1.0f, 50.0f);
 }
