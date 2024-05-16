@@ -55,6 +55,8 @@ int main(int argc, char **argv)
         throw std::runtime_error("Glew init error");
     }
 
+    glEnable(GL_DEPTH_TEST);
+
     // Setup scene
 
     float aspect = (float)DEFAULT_WINDOW_WIDTH / (float)DEFAULT_WINDOW_HEIGHT;
@@ -116,7 +118,7 @@ int main(int argc, char **argv)
         ImGui::NewFrame();
 
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Config->DisplayWidgets();
 
@@ -153,6 +155,7 @@ int main(int argc, char **argv)
         // {Config->CameraLocationX, Config->CameraLocationY, Config->CameraLocationZ}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f});
 
         plane1->transform = planeTransform;
+        plane1->size = Config->PlaneSize;
 
         //  Clear window
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);

@@ -29,7 +29,7 @@ public:
 		Mat4 rotate = MakeRotate(transform.rotation);
 		Mat4 scale = MakeScale(Vec4<T>(transform.scale));
 
-		Mat4 temp = scale * rotate * translate;
+		Mat4 temp = translate * rotate * scale;
 
 		m_coefs = temp.m_coefs;
 	}
