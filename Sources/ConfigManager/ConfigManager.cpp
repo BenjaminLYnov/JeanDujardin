@@ -1,7 +1,9 @@
 #include "ConfigManager.h"
-#include <iostream>
+
 #include "Widget/Partials/FloatSlider.h"
 #include "Widget/Partials/BooleanCheckbox.h"
+
+#include <iostream>
 
 UConfigManager *UConfigManager::Instance{nullptr};
 std::mutex UConfigManager::Mutex;

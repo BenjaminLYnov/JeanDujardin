@@ -1,8 +1,6 @@
 #ifndef SECONDEXAMPLE_H
 #define SECONDEXAMPLE_H
 
-#pragma once
-
 class UConfigManager;
 
 class ASecondExample

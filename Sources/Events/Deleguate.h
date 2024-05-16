@@ -1,8 +1,6 @@
 #ifndef DELEGUATE_H
 #define DELEGUATE_H
 
-#pragma once
-
 #include <functional>
 
 class UDeleguate

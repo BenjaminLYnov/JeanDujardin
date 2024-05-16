@@ -1,4 +1,5 @@
-#pragma once
+#ifndef QUATERNION_H
+#define QUATERNION_H
 
 #include "KMath.h"
 #include "MathVector.h"
@@ -6,7 +7,8 @@
 #include <cmath>
 
 template<typename T>
-struct Quaternion {
+struct Quaternion 
+{
 	Quaternion(const T& angle, const Vec3<T>& axis)
 		: x(std::sin(angle / 2)* axis.x)
 		, y(std::sin(angle / 2)* axis.y)
@@ -38,7 +40,8 @@ struct Quaternion {
 		_normalize();
 	}
 
-	Vec3<T> ToEuler() {
+	Vec3<T> ToEuler() 
+	{
 		return Vec3<T>(
 			atan2( 2 * x * w  + 2 * y * z , 1 - 2 * x * x - 2 * y * y)
 			, F_PI * -0.5f + 2 * atan2(sqrt(1 + 2 * y * w - 2 * x * z), sqrt(1 - 2 * y * w + 2 * x * z))
@@ -47,6 +50,7 @@ struct Quaternion {
 	}
 
 private:
+
 	void _normalize()
 	{
 		T n = sqrt(x * x + y * y + z * z + w * w);
@@ -55,10 +59,14 @@ private:
 		z /= n;
 		w /= n;
 	}
+
 public:
 	T x;
 	T y;
 	T z;
 	T w;
 };
+
 using QuatF = Quaternion<float>;
+
+#endif // QUATERNION_H

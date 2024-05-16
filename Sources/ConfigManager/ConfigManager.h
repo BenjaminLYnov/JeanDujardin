@@ -1,11 +1,10 @@
 #ifndef CONFIGMANAGER_H
 #define CONFIGMANAGER_H
 
-#pragma once
-
 #include "Widget/WidgetManager.h"
-#include <mutex>
 #include "Events/Deleguate.h"
+
+#include <mutex>
 
 class UConfigManager : public UWidgetManager
 {

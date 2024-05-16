@@ -2,8 +2,12 @@
 #include "imgui.h"
 #include <iostream>
 
-UFloatSlider::UFloatSlider(const std::string label, float *value, float min, float max)
-    : label(std::move(label)), value(value), min(min), max(max) {}
+UFloatSlider::UFloatSlider(const std::string &label, float *value, float min, float max)
+    : label(label)
+    , value(value)
+    , min(min)
+    , max(max) 
+{}
 
 void UFloatSlider::Display() 
 {

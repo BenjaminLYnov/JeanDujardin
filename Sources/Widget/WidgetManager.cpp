@@ -5,6 +5,11 @@ UWidgetManager::UWidgetManager()
 {
 }
 
+UWidgetManager::~UWidgetManager()
+{
+    // Delete all widgets ? 
+}
+
 void UWidgetManager::DisplayWidgets()
 {
     for (const auto &Widget : Widgets)
