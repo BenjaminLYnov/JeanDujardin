@@ -31,3 +31,7 @@ mkdir build & cd build & cmake ..
 - Play, or not
 
 --------------------------------------------------
+
+## Sources
+#### Travis Archer - [Procedurally generating terrain](https://micsymposium.org/mics_2011_proceedings/mics2011_submission_30.pdf)
+#### Zipper - [C++: Perlin Noise Tutorial](https://www.youtube.com/watch?v=kCIaHqb60Cw)
