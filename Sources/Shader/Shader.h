@@ -1,8 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#pragma once
-
 #include <string>
 
 struct ShaderInfo
