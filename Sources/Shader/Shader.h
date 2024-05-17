@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <string>
 
@@ -12,7 +13,6 @@ struct ShaderInfo
 struct Shader
 {
 	static unsigned int loadShaders(ShaderInfo* shaderInfo);
-
-private:
-
 };
+
+#endif // SHADER_H

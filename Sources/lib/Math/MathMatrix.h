@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATH_MATRIX_H
+#define MATH_MATRIX_H
 
 #include "Quaternion.h"
 #include "Transform.h"
@@ -8,9 +9,11 @@
 const int MAT_4_SIZE = 4;
 
 template<typename T>
-class Mat4 {
+class Mat4 
+{
 public:
-	Mat4() {
+	Mat4() 
+	{
 		for (int row = 0; row < MAT_4_SIZE; ++row)
 		{
 			for (int col = 0; col < MAT_4_SIZE; ++col)
@@ -20,17 +23,19 @@ public:
 		}
 	}
 
-	Mat4(const Transform<T>& transform) {
+	Mat4(const Transform<T>& transform) 
+	{
 		Mat4 translate = MakeTranslate(Vec4<T>(transform.position));
 		Mat4 rotate = MakeRotate(transform.rotation);
 		Mat4 scale = MakeScale(Vec4<T>(transform.scale));
 
-		Mat4 temp = scale * rotate * translate;
+		Mat4 temp = translate * rotate * scale;
 
 		m_coefs = temp.m_coefs;
 	}
 
-	static Mat4<T> Identity() {
+	static Mat4<T> Identity() 
+	{
 		Mat4<T> result;
 
 		for (int row = 0; row < MAT_4_SIZE; ++row)
@@ -57,18 +62,22 @@ public:
 
 	// TRANSLATION MATRICES
 
-	static Mat4<T> MakeTranslate(const Vec4<T>& vec, const Mat4<T>& mat) {
+	static Mat4<T> MakeTranslate(const Vec4<T>& vec, const Mat4<T>& mat) 
+	{
 		Mat4<T> result = mat;
 		result.Translate(vec);
 		return result;
 	}
+
 	static Mat4<T> MakeTranslate(const Vec4<T>& vec)
 	{
 		Mat4<T> result = Identity();
 		result.Translate(vec);
 		return result;
 	}
-	void Translate(const Vec4<T>& vec) {
+
+	void Translate(const Vec4<T>& vec) 
+	{
 		operator()(0, 3) += vec.x;
 		operator()(1, 3) += vec.y;
 		operator()(2, 3) += vec.z;
@@ -76,18 +85,22 @@ public:
 
 	// SCALE MATRICES
 
-	static Mat4<T> MakeScale(const Vec4<T>& vec, const Mat4<T>& mat) {
+	static Mat4<T> MakeScale(const Vec4<T>& vec, const Mat4<T>& mat) 
+	{
 		Mat4<T> result = mat;
 		result.Scale(vec);
 		return result;
 	}
+
 	static Mat4<T> MakeScale(const Vec4<T>& vec)
 	{
 		Mat4<T> result = Identity();
 		result.Scale(vec);
 		return result;
 	}
-	void Scale(const Vec4<T>& vec) {
+
+	void Scale(const Vec4<T>& vec) 
+	{
 		operator()(0, 0) *= vec.x;
 		operator()(1, 1) *= vec.y;
 		operator()(2, 2) *= vec.z;
@@ -101,12 +114,14 @@ public:
 		Quaternion<T> q(angle, axis);
 		return MakeRotate(q);
 	}
+
 	/* euler is a vec3 of rotation along each axis in radians */
 	static Mat4<T> MakeRotate(const Vec3<T>& euler)
 	{
 		Quaternion<T> q(euler);
 		return MakeRotate(q);
 	}
+
 	static Mat4<T> MakeRotate(const Quaternion<T>& quat)
 	{
 		Mat4<T> result = Identity();
@@ -134,6 +149,7 @@ public:
 private:
 	std::array<T, MAT_4_SIZE * MAT_4_SIZE> m_coefs;
 };
+
 using Mat4F = Mat4<float>;
 
 template<typename T>
@@ -187,3 +203,5 @@ Mat4<T> operator*(const Mat4<T>& mat, const Vec4<T>& vec)
 		, mat(3, 0) * vec.x + mat(3, 1) * vec.y + mat(3, 2) * vec.z + mat(3, 3) * vec.w
 	);
 }
+
+#endif // MATH_MATRIX_H

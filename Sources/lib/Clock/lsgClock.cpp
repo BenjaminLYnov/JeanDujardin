@@ -2,8 +2,10 @@
 
 #include "GLFW/glfw3.h"
 
-slgClock::slgClock() : startTime(glfwGetTime())
-{}
+slgClock::slgClock() 
+	: startTime(glfwGetTime())
+{
+}
 
 double slgClock::getEllapsedTime() const
 {

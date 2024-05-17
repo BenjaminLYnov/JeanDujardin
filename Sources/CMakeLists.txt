@@ -40,7 +40,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC c_std_11 cxx_std_20)
 ##############################################################
 
 # FetchContent Glfw, ImGui
-
 include(FetchContent)
 FetchContent_Declare(
     glfw
@@ -89,4 +88,17 @@ set_target_properties(${PROJECT_NAME}
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_SOURCE_DIR}/output)
+
+# Copy ressources directory to output
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/ressources $<TARGET_FILE_DIR:${PROJECT_NAME}>/ressources
+)
+
+# Copy dll files to output
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/extern/glew-2.1.0/bin/Release/x64/glew32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>
+)
+
 ##############################################################

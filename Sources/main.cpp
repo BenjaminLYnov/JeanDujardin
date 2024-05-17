@@ -9,6 +9,9 @@
 #include "lib/Math/Vertex.h"
 #include "lib/Clock/lsgClock.h"
 #include "Geometries/Triangle.h"
+#include "Geometries/Plane.h"
+
+#include "ConfigManager/ConfigManager.h"
 
 #include <cmath>
 #include <array>
@@ -16,16 +19,14 @@
 const unsigned DEFAULT_WINDOW_WIDTH = 800;
 const unsigned DEFAULT_WINDOW_HEIGHT = 600;
 
-static void glfw_error_callback(int error, const char* description)
+static void glfw_error_callback(int error, const char *description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-/// \fn int main(int argc, char** argv)
-///
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    // Setup OPTICK 
+    // Setup OPTICK
     // OPTICK_FRAME("MainThread");
 
     // Setup GLFW
@@ -36,37 +37,27 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    const char* glsl_version = "#version 130";
+    const char *glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 
     // Create window with graphics context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
     if (window == nullptr)
         return 1;
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    //Setup GLEW
+    // Setup GLEW
     glewExperimental = GL_TRUE;
     if (glewInit())
     {
         throw std::runtime_error("Glew init error");
     }
 
+    glEnable(GL_DEPTH_TEST);
+
     // Setup scene
-
-    VertexF p0{ {  -0.8f, -0.9f, 0.f }, { 1.f, 0.f, 0.f, 1.f } };
-    VertexF p1{ {   0.9f, -0.9f, 0.f }, { 0.f, 1.f, 0.f, 1.f } };
-    VertexF p2{ {   0.9f,  0.8f, 0.f }, { 0.f, 0.f, 1.f, 1.f } };
-
-    TriangleF t0{ p0, p1, p2 };
-
-    p0 = { {  -0.9f, -0.8f, 0.f }, { 1.f, 0.f, 1.f, 1.f } };
-    p1 = { {  -0.9f,  0.9f, 0.f }, { 1.f, 1.f, 0.f, 1.f } };
-    p2 = { {   0.8f,  0.9f, 0.f }, { 0.f, 1.f, 1.f, 1.f } };
-
-    TriangleF t1{ p0, p1, p2 };
 
     float aspect = (float)DEFAULT_WINDOW_WIDTH / (float)DEFAULT_WINDOW_HEIGHT;
     float fov = 45.f / 180.f * F_PI;
@@ -74,21 +65,23 @@ int main(int argc, char** argv)
     float f = 100.f;
 
     // Camera Transform :
-    float cameraPitch = 0.f;
-    float cameraRoll = 0.f;
-    float cameraYaw = 0.f;
-    TransformF cameraPosition(
-        { 0.f, 0.f, -10.f }
-        , { cameraPitch, cameraRoll, cameraYaw }
-        , { 1.f, 1.f, 1.f }
-    );
+ 
+    TransformF cameraTransform(
+        {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f});
+
+    // plane transform
+    TransformF planeTransform(
+        {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f});
+
+    PlaneF *plane1 = new PlaneF(planeTransform, 10);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -98,13 +91,15 @@ int main(int argc, char** argv)
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Our state
-    bool show_demo_window = true;
+    bool show_demo_window = false;
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Start clock
     slgClock clock;
     double dTime = clock.restart();
+
+    auto Config = UConfigManager::GetInstance();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -122,37 +117,18 @@ int main(int argc, char** argv)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // 1. Show a demo window (In most cases you probably don't want this)
-        if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
+        Config->DisplayWidgets();
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
+        // IMPORTANT
+        // Confi->DisplayWidgets();
 
         // 3. Show another simple window.
         if (show_another_window)
         {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+            ImGui::Begin("Another Window", &show_another_window); // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
             ImGui::Text("Hello from another window!");
             if (ImGui::Button("Close Me"))
                 show_another_window = false;
@@ -160,32 +136,41 @@ int main(int argc, char** argv)
         }
 
         // update scene
-        cameraPitch += dTime;
-        //cameraYaw += dTime;
-        cameraPosition.rotation = QuatF({ F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f });
+        // cameraPitch += dTime;
+        // cameraYaw += dTime;
+        cameraTransform = TransformF(
+            {Config->CameraLocationX, Config->CameraLocationY, Config->CameraLocationZ},
+            {Config->CameraRotationPitch, Config->CameraRotationRoll, Config->CameraRotationYaw},
+            {Config->CameraScaleX, Config->CameraScaleY, Config->CameraScaleZ});
+
+        // cameraTransform.rotation = QuatF({F_PI * 0.25f * sin(cameraPitch), cameraRoll, cameraYaw * F_PI * 2.f});
 
         Mat4F P = Mat4F::MakeProjection(aspect, fov, n, f);
-        Mat4F V(cameraPosition);
-        //V = Mat4F::Identity();
-        Mat4F M = Mat4F({ {0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
-        //M = Mat4F::Identity();
-        Mat4F M2 = Mat4F({ {0.f, 0.f, -20.f}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f} });
+        Mat4F V(cameraTransform);
 
-        auto MVP = P * (V * M);
-        auto MVP2 = P * (V * M2);
+        planeTransform = TransformF(
+            {Config->PlaneLocationX, Config->PlaneLocationY, Config->PlaneLocationZ},
+            {Config->PlaneRotationPitch, Config->PlaneRotationRoll, Config->PlaneRotationYaw},
+            {Config->PlaneScaleX, Config->PlaneScaleY, Config->PlaneScaleZ});
+        // {Config->CameraLocationX, Config->CameraLocationY, Config->CameraLocationZ}, {0.f, 0.f, 0.f}, {1.f, 1.f, 1.f});
 
+        plane1->transform = planeTransform;
+        plane1->size = Config->PlaneSize;
+
+        //  Clear window
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        t0.render(MVP2);
-        t1.render(MVP);
-
         // Rendering
+        plane1->render(V, P);
+
+        //    std::cout << Config->CameraLocationX << "\n";
+
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
         aspect = (float)display_w / (float)display_h;
+        glViewport(0, 0, display_w, display_h);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
@@ -198,6 +183,8 @@ int main(int argc, char** argv)
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete plane1;
 
     return 0;
 }
